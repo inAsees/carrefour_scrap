@@ -68,3 +68,9 @@ class Scrapper:
         for i in product_txt:
             if i.isdigit():
                 return int(i)
+
+    @staticmethod
+    def _get_description(product_soup: bs) -> str:
+        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
+        product_json = json.loads(product_txt)
+        return product_json["description"]
