@@ -41,6 +41,8 @@ class Scrapper:
         product_url = product_url
         product_name = cls._get_product_name(product_soup)
         price = cls._get_price(product_soup)
+        pack_size = cls._get_pack_size(product_soup)
+        inventory_left = cls._get_inventory_left(product_soup)
 
     @staticmethod
     def _get_product_name(product_soup: bs) -> str:
