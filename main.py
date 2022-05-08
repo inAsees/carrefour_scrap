@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 
 
 @dataclass
-class BeverageInfo:
+class ProductInfo:
     product_url: str
     product_name: str
     price: str
@@ -19,17 +19,26 @@ class BeverageInfo:
 class Scrapper:
     def __init__(self):
         self._base_url = "https://www.carrefour.ke"
-        self._category_beverages_url = self._base_url + "/mafken/en/c/FKEN1500000"
+        self._category_beverage_url = self._base_url + "/mafken/en/c/FKEN1500000"
+        self._product_info_list = []
 
-    def get_beverage_url(self, base_url: str):
-        with open("base_url.html", "r", encoding="UTF-8") as f:
-            page_soup = bs(f, "html.parser")
+    def scrap_product_url(self, base_url: str) -> None:
+        category_beverage_url = self._category_beverage_url
+        page_src = req.get(category_beverage_url).text
+        page_soup = bs(page_src, "html.parser")
         page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
         page_json = json.loads(page_txt)
-        for url in page_json["props"]["initialState"]["search"]["products"]:
-            beverage_url = base_url + url["url"]
-            pass
+        for idx in page_json["props"]["initialState"]["search"]["products"]:
+            product_url = base_url + idx["url"]
+            product_info = self._parse_product_info(product_url)
+            self._product_info_list.append(product_info)
+
+    def _parse_product_info(self, product_url: str) -> ProductInfo:
+        product_url = product_url
+        product_name =
+
+    def _get_product_name(self, ):
+        pass
 
 
-if __name__ == "__main__":
-    pass
+
