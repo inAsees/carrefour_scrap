@@ -13,7 +13,6 @@ class ProductInfo:
     pack_size: str
     inventory_left: int
     description: str
-    brand: str
     all_images_url: List[str]
 
 
@@ -23,15 +22,15 @@ class Scrapper:
         self._category_beverage_url = self._base_url + "/mafken/en/c/FKEN1500000"
         self._product_info_list = []
 
-    def scrap_product_url(self, base_url: str) -> None:
+    def scrap_product_url(self) -> None:
         category_beverage_url = self._category_beverage_url
-        page_src = req.get(category_beverage_url).text
+        page_src = req.get(category_beverage_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
         page_soup = bs(page_src, "html.parser")
         page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
         page_json = json.loads(page_txt)
         for idx in page_json["props"]["initialState"]["search"]["products"]:
-            product_url = base_url + idx["url"]
-            page_src = req.get(product_url).text
+            product_url = self._base_url + idx["url"]
+            page_src = req.get(product_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
             detail_product_soup = bs(page_src, "html.parser")
             product_info = self._parse_product_info(detail_product_soup, product_url)
             self._product_info_list.append(product_info)
@@ -45,6 +44,8 @@ class Scrapper:
         inventory_left = cls._get_inventory_left(product_soup)
         description = cls._get_description(product_soup)
         image_urls = cls._get_image_urls(product_soup)
+
+        return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, image_urls)
 
     @staticmethod
     def _get_product_name(product_soup: bs) -> str:
