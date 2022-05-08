@@ -3,6 +3,7 @@ from typing import List
 import requests as req
 import json
 from bs4 import BeautifulSoup as bs
+from tqdm import tqdm
 
 
 @dataclass
@@ -28,7 +29,7 @@ class Scrapper:
         page_soup = bs(page_src, "html.parser")
         page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
         page_json = json.loads(page_txt)
-        for idx in page_json["props"]["initialState"]["search"]["products"]:
+        for idx in tqdm(page_json["props"]["initialState"]["search"]["products"], desc="scrapping"):
             product_url = self._base_url + idx["url"]
             page_src = req.get(product_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
             detail_product_soup = bs(page_src, "html.parser")
@@ -86,3 +87,5 @@ class Scrapper:
         for idx in product_imgs:
             img_url_list.append(idx.get("data-src").strip())
         return img_url_list
+
+
