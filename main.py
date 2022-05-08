@@ -59,3 +59,10 @@ class Scrapper:
         idx = product_txt.index(":")
         pack_size = product_txt[idx + 2:]
         return pack_size
+
+    @staticmethod
+    def _get_inventory_left(product_soup: bs) -> int:
+        product_txt = product_soup.find("div", {"class": "css-g4iap9"}).text.split()
+        for i in product_txt:
+            if i.isdigit():
+                return int(i)
