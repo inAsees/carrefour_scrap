@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 import requests as req
 import json
 from bs4 import BeautifulSoup as bs
@@ -13,7 +14,7 @@ class ProductInfo:
     inventory_left: int
     description: str
     brand: str
-    all_images_url: str
+    all_images_url: List[str]
 
 
 class Scrapper:
@@ -30,15 +31,28 @@ class Scrapper:
         page_json = json.loads(page_txt)
         for idx in page_json["props"]["initialState"]["search"]["products"]:
             product_url = base_url + idx["url"]
-            product_info = self._parse_product_info(product_url)
+            page_src = req.get(product_url).text
+            product_soup = bs(page_src, "html.parser")
+            product_info = self._parse_product_info(product_soup, product_url)
             self._product_info_list.append(product_info)
 
-    def _parse_product_info(self, product_url: str) -> ProductInfo:
+    @classmethod
+    def _parse_product_info(cls, product_soup: bs, product_url: str) -> ProductInfo:
         product_url = product_url
-        product_name =
+        product_name = cls._get_product_name(product_soup)
+        price = cls._get_price(product_soup)
 
-    def _get_product_name(self, ):
-        pass
+    @staticmethod
+    def _get_product_name(product_soup: bs) -> str:
+        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
+        product_json = json.loads(product_txt)
+        return product_json["name"].strip()
 
+    @staticmethod
+    def _get_price(product_soup: bs) -> str:
+        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
+        product_json = json.loads(product_txt)
+        price = product_json["offers"]["priceCurrency"] + " " + product_json["offers"]["price"] + ".00"
+        return price.strip()
 
 
