@@ -50,9 +50,5 @@ class Scrapper:
 
     @staticmethod
     def _get_price(product_soup: bs) -> str:
-        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
-        product_json = json.loads(product_txt)
-        price = product_json["offers"]["priceCurrency"] + " " + product_json["offers"]["price"] + ".00"
-        return price.strip()
-
-
+        product_txt = product_soup.find("h2", {"class": "css-17ctnp"}).text
+        return " ".join(product_txt.split()[:2])
