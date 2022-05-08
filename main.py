@@ -32,8 +32,8 @@ class Scrapper:
         for idx in page_json["props"]["initialState"]["search"]["products"]:
             product_url = base_url + idx["url"]
             page_src = req.get(product_url).text
-            product_soup = bs(page_src, "html.parser")
-            product_info = self._parse_product_info(product_soup, product_url)
+            detail_product_soup = bs(page_src, "html.parser")
+            product_info = self._parse_product_info(detail_product_soup, product_url)
             self._product_info_list.append(product_info)
 
     @classmethod
@@ -44,6 +44,7 @@ class Scrapper:
         pack_size = cls._get_pack_size(product_soup)
         inventory_left = cls._get_inventory_left(product_soup)
         description = cls._get_description(product_soup)
+        image_urls = cls._get_image_urls(product_soup)
 
     @staticmethod
     def _get_product_name(product_soup: bs) -> str:
@@ -75,3 +76,12 @@ class Scrapper:
         product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
         product_json = json.loads(product_txt)
         return product_json["description"]
+
+    @staticmethod
+    def _get_image_urls(product_soup: bs) -> List[str]:
+        img_url_list = []
+        product_txt = product_soup.findAll("div", {"class": "swiper-wrapper"})
+        product_imgs = product_txt[1].findAll("img")
+        for idx in product_imgs:
+            img_url_list.append(idx.get("data-src").strip())
+        return img_url_list
