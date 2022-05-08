@@ -52,3 +52,10 @@ class Scrapper:
     def _get_price(product_soup: bs) -> str:
         product_txt = product_soup.find("h2", {"class": "css-17ctnp"}).text
         return " ".join(product_txt.split()[:2])
+
+    @staticmethod
+    def _get_pack_size(product_soup: bs) -> str:
+        product_txt = product_soup.find("div", {"class": "css-1kxxv3q"}).text
+        idx = product_txt.index(":")
+        pack_size = product_txt[idx + 2:]
+        return pack_size
