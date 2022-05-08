@@ -61,10 +61,14 @@ class Scrapper:
 
     @staticmethod
     def _get_pack_size(product_soup: bs) -> str:
-        product_txt = product_soup.find("div", {"class": "css-1kxxv3q"}).text
-        idx = product_txt.index(":")
-        pack_size = product_txt[idx + 2:]
-        return pack_size
+        try:
+            product_txt = product_soup.find("div", {"class": "css-1kxxv3q"}).text
+            idx = product_txt.index(":")
+            pack_size = product_txt[idx + 2:]
+            return pack_size
+        except AttributeError as e:
+            print("Pack size not available")
+            return ""
 
     @staticmethod
     def _get_inventory_left(product_soup: bs) -> int:
@@ -74,7 +78,6 @@ class Scrapper:
                 if i.isdigit():
                     return int(i)
         except AttributeError as e:
-            print(e)
             return 0
 
     @staticmethod
