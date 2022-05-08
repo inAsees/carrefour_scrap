@@ -29,7 +29,7 @@ class Scrapper:
         page_soup = bs(page_src, "html.parser")
         page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
         page_json = json.loads(page_txt)
-        for idx in tqdm(page_json["props"]["initialState"]["search"]["products"], desc="scrapping"):
+        for idx in page_json["props"]["initialState"]["search"]["products"]:
             product_url = self._base_url + idx["url"]
             page_src = req.get(product_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
             detail_product_soup = bs(page_src, "html.parser")
@@ -56,8 +56,8 @@ class Scrapper:
 
     @staticmethod
     def _get_price(product_soup: bs) -> str:
-        product_txt = product_soup.find("h2", {"class": "css-17ctnp"}).text
-        return " ".join(product_txt.split()[:2])
+        product_txt = product_soup.find("h2", {"class": "css-17ctnp"}).text.split("(Inc. VAT)")
+        return product_txt[0]
 
     @staticmethod
     def _get_pack_size(product_soup: bs) -> str:
@@ -68,10 +68,14 @@ class Scrapper:
 
     @staticmethod
     def _get_inventory_left(product_soup: bs) -> int:
-        product_txt = product_soup.find("div", {"class": "css-g4iap9"}).text.split()
-        for i in product_txt:
-            if i.isdigit():
-                return int(i)
+        try:
+            product_txt = product_soup.find("div", {"class": "css-g4iap9"}).text.split()
+            for i in product_txt:
+                if i.isdigit():
+                    return int(i)
+        except AttributeError as e:
+            print(e)
+            return 0
 
     @staticmethod
     def _get_description(product_soup: bs) -> str:
@@ -87,5 +91,3 @@ class Scrapper:
         for idx in product_imgs:
             img_url_list.append(idx.get("data-src").strip())
         return img_url_list
-
-
