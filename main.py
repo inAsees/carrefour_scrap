@@ -68,7 +68,7 @@ class Scrapper:
         page_src = req.get(self._page_0_url, headers=self._headers).json()
         return page_src["numOfPages"]
 
-    def _parse_product_info(self, products_list: List[Dict], page_no: int) -> ProductInfo:
+    def _parse_product_info(self, products_list: List[Dict], page_no: int) -> None:
         for product in tqdm(products_list, desc="Scrapping page {} products".format(page_no)):
             product_url = self._get_product_url(product)
             product_name = self._get_product_name(product)
@@ -79,8 +79,8 @@ class Scrapper:
             brand = self._get_brand(product)
             image_urls = self._get_image_urls(product)
 
-            return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, brand,
-                               image_urls)
+            self._product_info_list.append(ProductInfo(product_url, product_name, price, pack_size, inventory_left,
+                                                       description, brand, image_urls))
 
     def _get_product_url(self, product: Dict) -> str:
         return self._base_url + product["links"]["productUrl"]["href"]
