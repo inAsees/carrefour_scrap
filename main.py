@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Dict, Optional
 import requests as req
-import json
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
 import csv
