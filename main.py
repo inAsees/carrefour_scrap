@@ -67,7 +67,7 @@ class Scrapper:
             product_url = self._get_product_url(product)
             product_name = self._get_product_name(product)
             price = self._get_price(product)
-            pack_size = self._get_pack_size(product_soup)
+            pack_size = self._get_pack_size(product)
             inventory_left = self._get_inventory_left(product_soup)
             description = self._get_description(product_soup)
             image_urls = self._get_image_urls(product_soup)
@@ -86,12 +86,9 @@ class Scrapper:
         return product["price"]["currency"] + " " + product["price"]["minBuyingValue"]
 
     @staticmethod
-    def _get_pack_size(product_soup: bs) -> str:
+    def _get_pack_size(product: Dict) -> str:
         try:
-            product_txt = product_soup.find("div", {"class": "css-1kxxv3q"}).text
-            idx = product_txt.index(":")
-            pack_size = product_txt[idx + 2:]
-            return pack_size
+            return product["size"]
         except AttributeError:
             print("Pack size not available")
             return ""
