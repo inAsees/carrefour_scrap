@@ -62,22 +62,20 @@ class Scrapper:
         page_src = req.get(self._page_0_url, headers=self._headers).json()
         return page_src["numOfPages"]
 
-    @classmethod
-    def _parse_product_info(cls, products_list: List[Dict]) -> ProductInfo:
+    def _parse_product_info(self, products_list: List[Dict]) -> ProductInfo:
         for product in products_list:
-            product_url = cls._get_product_url(product)
-            product_name = cls._get_product_name(product_soup)
-            price = cls._get_price(product_soup)
-            pack_size = cls._get_pack_size(product_soup)
-            inventory_left = cls._get_inventory_left(product_soup)
-            description = cls._get_description(product_soup)
-            image_urls = cls._get_image_urls(product_soup)
+            product_url = self._get_product_url(product)
+            product_name = self._get_product_name(product_soup)
+            price = self._get_price(product_soup)
+            pack_size = self._get_pack_size(product_soup)
+            inventory_left = self._get_inventory_left(product_soup)
+            description = self._get_description(product_soup)
+            image_urls = self._get_image_urls(product_soup)
 
             return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, image_urls)
 
     def _get_product_url(self, product: Dict) -> str:
         return self._base_url + product["links"]["productUrl"]["href"]
-
 
     @staticmethod
     def _get_product_name(product_soup: bs) -> str:
