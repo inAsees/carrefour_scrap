@@ -1,0 +1,1 @@
+In this project website www.carrefour.ke is scrapped for required data  and the scraped data is then dumped into users local system as csv file.
