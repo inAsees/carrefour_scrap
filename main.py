@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Optional
 import requests as req
 import json
 from bs4 import BeautifulSoup as bs
@@ -12,9 +12,10 @@ class ProductInfo:
     product_url: str
     product_name: str
     price: str
-    pack_size: str
-    inventory_left: str
+    pack_size: Optional[str]
+    inventory_left: Optional[str]
     description: str
+    brand: Optional[str]
     all_images_url: List[str]
 
 
@@ -86,22 +87,22 @@ class Scrapper:
         return product["price"]["currency"] + " " + product["price"]["minBuyingValue"]
 
     @staticmethod
-    def _get_pack_size(product: Dict) -> str:
+    def _get_pack_size(product: Dict) -> Optional[str]:
         try:
             return product["size"]
         except AttributeError:
             print("Pack size not available")
-            return ""
+            return None
 
     @staticmethod
-    def _get_inventory_left(product: Dict) -> str:
+    def _get_inventory_left(product: Dict) -> Optional[str]:
         try:
             return str(product["stock"]["value"])
         except AttributeError as e:
-            return ""
+            return None
 
     @staticmethod
-    def _get_description(product_soup: bs) -> str:
+    def _get_description(product: Dict) -> str:
         product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
         product_json = json.loads(product_txt)
         return product_json["description"]
