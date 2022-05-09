@@ -92,10 +92,11 @@ class Scrapper:
         product_soup = bs(page_src, "html.parser")
         try:
             product_text = product_soup.find("script", {"type": "application/ld+json"}).text
+            product_json = json.loads(product_text)
+            return product_json["description"]
         except AttributeError:
             return ""
-        product_json = json.loads(product_text)
-        return product_json["description"]
+
 
     @staticmethod
     def _get_product_name(product: Dict) -> str:
