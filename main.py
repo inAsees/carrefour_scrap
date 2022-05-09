@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 import requests as req
 import json
 from bs4 import BeautifulSoup as bs
@@ -40,7 +40,8 @@ class Scrapper:
 
     def scrap_all_pages(self) -> None:
         for url in self._page_urls:
-            print(url)
+            page_json = req.get(url, headers=self._headers).json()
+            self._parse_product_info(page_json)
 
     def dump(self, file_path: str) -> None:
         with open(file_path, "w", encoding="utf-8", newline="") as f:
@@ -122,5 +123,4 @@ class Scrapper:
 
 
 if __name__ == "__main__":
-    scrapper = Scrapper()
-    scrapper.scrap_all_pages()
+    scrapper = Scrapper().scrap_all_pages()
