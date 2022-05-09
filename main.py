@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import List, Dict, Optional
 import requests as req
@@ -39,14 +40,14 @@ class Scrapper:
         self._product_info_list = []  # type: List[ProductInfo]
 
     def scrap_all_pages(self) -> None:
-        page_no = 0
+        page_no = 1
         for url in self._page_urls:
             page_json = req.get(url, headers=self._headers).json()
             self._parse_product_info(page_json["products"], page_no)
             page_no += 1
 
-    def dump(self, file_path: str) -> None:
-        with open(file_path, "w", encoding="utf-8", newline="") as f:
+    def dump(self) -> None:
+        with open("dump.csv", "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["product_url", "product_name", "price", "pack_size",
                                                    "inventory_left", "description", "brand", "image_urls"])
             writer.writeheader()
@@ -60,7 +61,7 @@ class Scrapper:
                         "inventory_left": ele.inventory_left,
                         "description": ele.description,
                         "brand": ele.brand,
-                        "image_urls": ele.all_images_url
+                        "image_urls": ele.image_urls
                     }
                 )
 
@@ -89,7 +90,11 @@ class Scrapper:
         product_url = self._get_product_url(product)
         page_src = req.get(product_url, headers=self._headers).text
         product_soup = bs(page_src, "html.parser")
-        product_json = product_soup.find("script", {"type": "application/ld+json"}).json()
+        try:
+            product_text = product_soup.find("script", {"type": "application/ld+json"}).text
+        except AttributeError:
+            return ""
+        product_json = json.loads(product_text)
         return product_json["description"]
 
     @staticmethod
@@ -129,4 +134,4 @@ class Scrapper:
 if __name__ == "__main__":
     scrapper = Scrapper()
     scrapper.scrap_all_pages()
-    scrapper.dump(r"C:\Users\DELL\Desktop\test_files\sample.csv")
+    scrapper.dump()
