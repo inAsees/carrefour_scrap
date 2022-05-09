@@ -65,8 +65,8 @@ class Scrapper:
                 )
 
     def _get_total_pages(self) -> int:
-        page_src = req.get(self._page_0_url, headers=self._headers).json()
-        return page_src["numOfPages"]
+        page_json = req.get(self._page_0_url, headers=self._headers).json()
+        return page_json["numOfPages"]
 
     def _parse_product_info(self, products_list: List[Dict], page_no: int) -> None:
         for product in tqdm(products_list, desc="Scrapping page {} products".format(page_no)):
