@@ -111,7 +111,7 @@ class Scrapper:
     def _get_inventory_left(product: Dict) -> Optional[str]:
         try:
             return str(product["stock"]["value"])
-        except AttributeError as e:
+        except KeyError:
             return None
 
     @staticmethod
