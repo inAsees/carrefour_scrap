@@ -42,19 +42,6 @@ class Scrapper:
         for url in self._page_urls:
             print(url)
 
-    def scrap_product_url(self) -> None:
-        category_beverage_url = self._category_beverage_url
-        page_src = req.get(category_beverage_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
-        page_soup = bs(page_src, "html.parser")
-        page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
-        page_json = json.loads(page_txt)
-        for idx in tqdm(page_json["props"]["initialState"]["search"]["products"], desc="scraping"):
-            product_url = self._base_url + idx["url"]
-            page_src = req.get(product_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
-            detail_product_soup = bs(page_src, "html.parser")
-            product_info = self._parse_product_info(detail_product_soup, product_url)
-            self._product_info_list.append(product_info)
-
     def dump(self, file_path: str) -> None:
         with open(file_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["product_url", "product_name", "price", "pack_size",
