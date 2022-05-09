@@ -46,7 +46,7 @@ class Scrapper:
     def dump(self, file_path: str) -> None:
         with open(file_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["product_url", "product_name", "price", "pack_size",
-                                                   "inventory_left", "description", "all_images_url"])
+                                                   "inventory_left", "description", "brand", "all_images_url"])
             writer.writeheader()
             for ele in tqdm(self._product_info_list, desc="Dumping..."):
                 writer.writerow(
@@ -57,6 +57,7 @@ class Scrapper:
                         "pack_size": ele.pack_size,
                         "inventory_left": ele.inventory_left,
                         "description": ele.description,
+                        "brand": ele.brand,
                         "all_images_url": ele.all_images_url
                     }
                 )
