@@ -22,7 +22,7 @@ class Scrapper:
     def __init__(self):
         self._base_url = "https://www.carrefour.ke"
         self._page_0_url = "https://www.carrefour.ke/api/v7/categories/FKEN1500000?filter=&sortBy=relevance&" \
-                           "currentPage=1&pageSize=60&maxPrice=&minPrice=&areaCode=Westlands%20-%20Nairobi&lang=" \
+                           "currentPage=0&pageSize=60&maxPrice=&minPrice=&areaCode=Westlands%20-%20Nairobi&lang=" \
                            "en&displayCurr=KES&latitude=-1.2672236834605626&longitude=36.810586556760555&" \
                            "responseWithCatTree=true&depth=3"
         self._headers = {'appid': 'Reactweb',
