@@ -51,13 +51,16 @@ class Scrapper:
             writer.writeheader()
             for ele in tqdm(self._product_info_list, desc="Dumping..."):
                 writer.writerow(
-                    {"product_url": ele.product_url,
-                     "product_name": ele.product_name,
-                     "price": ele.price,
-                     "pack_size": ele.pack_size,
-                     "inventory_left": ele.inventory_left,
-                     "description": ele.description,
-                     "all_images_url": ele.all_images_url})
+                    {
+                        "product_url": ele.product_url,
+                        "product_name": ele.product_name,
+                        "price": ele.price,
+                        "pack_size": ele.pack_size,
+                        "inventory_left": ele.inventory_left,
+                        "description": ele.description,
+                        "all_images_url": ele.all_images_url
+                    }
+                )
 
     def _get_total_pages(self) -> int:
         page_src = req.get(self._page_0_url, headers=self._headers).json()
@@ -70,7 +73,7 @@ class Scrapper:
             price = self._get_price(product)
             pack_size = self._get_pack_size(product)
             inventory_left = self._get_inventory_left(product)
-            description = self._get_description(product_soup)
+            description = self._get_description(product)
             image_urls = self._get_image_urls(product)
 
             return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, image_urls)
@@ -101,10 +104,11 @@ class Scrapper:
         except AttributeError as e:
             return None
 
-    @staticmethod
-    def _get_description(product: Dict) -> str:
-        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
-        product_json = json.loads(product_txt)
+    def _get_description(self, product: Dict) -> str:
+        product_url = self._get_product_url(product)
+        page_src = req.get(product_url, headers=self._headers).text
+        product_soup = bs(page_src, "html.parser")
+        product_json = product_soup.find("script", {"type": "application/ld+json"}).json()
         return product_json["description"]
 
     @staticmethod
