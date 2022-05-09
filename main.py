@@ -65,7 +65,7 @@ class Scrapper:
     def _parse_product_info(self, products_list: List[Dict]) -> ProductInfo:
         for product in products_list:
             product_url = self._get_product_url(product)
-            product_name = self._get_product_name(product_soup)
+            product_name = self._get_product_name(product)
             price = self._get_price(product_soup)
             pack_size = self._get_pack_size(product_soup)
             inventory_left = self._get_inventory_left(product_soup)
@@ -78,10 +78,8 @@ class Scrapper:
         return self._base_url + product["links"]["productUrl"]["href"]
 
     @staticmethod
-    def _get_product_name(product_soup: bs) -> str:
-        product_txt = product_soup.find("script", {"type": "application/ld+json"}).text
-        product_json = json.loads(product_txt)
-        return product_json["name"].strip()
+    def _get_product_name(product: Dict) -> str:
+        return product["name"]
 
     @staticmethod
     def _get_price(product_soup: bs) -> str:
