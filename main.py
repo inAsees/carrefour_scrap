@@ -39,9 +39,11 @@ class Scrapper:
         self._product_info_list = []  # type: List[ProductInfo]
 
     def scrap_all_pages(self) -> None:
+        page_no = 0
         for url in self._page_urls:
             page_json = req.get(url, headers=self._headers).json()
-            self._parse_product_info(page_json["products"])
+            self._parse_product_info(page_json["products"], page_no)
+            page_no += 1
 
     def dump(self, file_path: str) -> None:
         with open(file_path, "w", encoding="utf-8", newline="") as f:
@@ -66,8 +68,8 @@ class Scrapper:
         page_src = req.get(self._page_0_url, headers=self._headers).json()
         return page_src["numOfPages"]
 
-    def _parse_product_info(self, products_list: List[Dict]) -> ProductInfo:
-        for product in products_list:
+    def _parse_product_info(self, products_list: List[Dict], page_no: int) -> ProductInfo:
+        for product in tqdm(products_list, desc="Scrapping page {} products".format(page_no)):
             product_url = self._get_product_url(product)
             product_name = self._get_product_name(product)
             price = self._get_price(product)
