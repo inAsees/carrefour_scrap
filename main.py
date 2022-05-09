@@ -66,7 +66,7 @@ class Scrapper:
         for product in products_list:
             product_url = self._get_product_url(product)
             product_name = self._get_product_name(product)
-            price = self._get_price(product_soup)
+            price = self._get_price(product)
             pack_size = self._get_pack_size(product_soup)
             inventory_left = self._get_inventory_left(product_soup)
             description = self._get_description(product_soup)
@@ -82,9 +82,8 @@ class Scrapper:
         return product["name"]
 
     @staticmethod
-    def _get_price(product_soup: bs) -> str:
-        product_txt = product_soup.find("h2", {"class": "css-17ctnp"}).text.split("(Inc. VAT)")
-        return product_txt[0]
+    def _get_price(product: Dict) -> str:
+        return product["price"]["currency"] + " " + product["price"]["minBuyingValue"]
 
     @staticmethod
     def _get_pack_size(product_soup: bs) -> str:
