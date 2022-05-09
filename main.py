@@ -4,6 +4,7 @@ import requests as req
 import json
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
+import csv
 
 
 @dataclass
@@ -21,7 +22,7 @@ class Scrapper:
     def __init__(self):
         self._base_url = "https://www.carrefour.ke"
         self._category_beverage_url = self._base_url + "/mafken/en/c/FKEN1500000"
-        self._product_info_list = []
+        self._product_info_list = []  # type: List[ProductInfo]
 
     def scrap_product_url(self) -> None:
         category_beverage_url = self._category_beverage_url
@@ -29,12 +30,28 @@ class Scrapper:
         page_soup = bs(page_src, "html.parser")
         page_txt = page_soup.find("script", {"id": "__NEXT_DATA__"}).text
         page_json = json.loads(page_txt)
-        for idx in page_json["props"]["initialState"]["search"]["products"]:
+        for idx in tqdm(page_json["props"]["initialState"]["search"]["products"], desc="scraping"):
             product_url = self._base_url + idx["url"]
             page_src = req.get(product_url, headers={'User-Agent': 'PostmanRuntime/7.29.0'}).text
             detail_product_soup = bs(page_src, "html.parser")
             product_info = self._parse_product_info(detail_product_soup, product_url)
             self._product_info_list.append(product_info)
+
+    def dump(self, file_path: str) -> None:
+        with open(file_path, "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["product_url", "product_name", "price", "pack_size",
+                                                   "inventory_left", "description", "all_images_url"])
+            writer.writeheader()
+            for ele in tqdm(self._product_info_list, desc="Dumping..."):
+                writer.writerow(
+                    {"product_url": ele.product_url,
+                     "product_name": ele.product_name,
+                     "price": ele.price,
+                     "pack_size": ele.pack_size,
+                     "inventory_left": ele.inventory_left,
+                     "description": ele.description,
+                     "all_images_url": ele.all_images_url})
+
 
     @classmethod
     def _parse_product_info(cls, product_soup: bs, product_url: str) -> ProductInfo:
@@ -66,7 +83,7 @@ class Scrapper:
             idx = product_txt.index(":")
             pack_size = product_txt[idx + 2:]
             return pack_size
-        except AttributeError as e:
+        except AttributeError:
             print("Pack size not available")
             return ""
 
