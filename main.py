@@ -104,8 +104,7 @@ class Scrapper:
     def _get_pack_size(product: Dict) -> Optional[str]:
         try:
             return product["size"]
-        except AttributeError:
-            print("Pack size not available")
+        except KeyError:
             return None
 
     @staticmethod
@@ -128,4 +127,6 @@ class Scrapper:
 
 
 if __name__ == "__main__":
-    scrapper = Scrapper().scrap_all_pages()
+    scrapper = Scrapper()
+    scrapper.scrap_all_pages()
+    scrapper.dump(r"C:\Users\DELL\Desktop\test_files\sample.csv")
