@@ -70,7 +70,7 @@ class Scrapper:
             pack_size = self._get_pack_size(product)
             inventory_left = self._get_inventory_left(product)
             description = self._get_description(product_soup)
-            image_urls = self._get_image_urls(product_soup)
+            image_urls = self._get_image_urls(product)
 
             return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, image_urls)
 
@@ -107,12 +107,10 @@ class Scrapper:
         return product_json["description"]
 
     @staticmethod
-    def _get_image_urls(product_soup: bs) -> List[str]:
+    def _get_image_urls(product: Dict) -> List[str]:
         img_url_list = []
-        product_txt = product_soup.findAll("div", {"class": "swiper-wrapper"})
-        product_imgs = product_txt[1].findAll("img")
-        for idx in product_imgs:
-            img_url_list.append(idx.get("data-src").strip())
+        for idx in product["links"]["images"]:
+            img_url_list.append(idx["href"])
         return img_url_list
 
 
