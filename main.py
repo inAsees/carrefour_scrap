@@ -25,9 +25,22 @@ class Scrapper:
                            "currentPage=1&pageSize=60&maxPrice=&minPrice=&areaCode=Westlands%20-%20Nairobi&lang=" \
                            "en&displayCurr=KES&latitude=-1.2672236834605626&longitude=36.810586556760555&" \
                            "responseWithCatTree=true&depth=3"
+        self._headers = {'appid': 'Reactweb',
+                         'storeid': 'mafken',
+                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                       'Chrome/101.0.4951.54 Safari/537.36'
+                         }
         _total_pages = self._get_total_pages()
+        self._page_urls = ["https://www.carrefour.ke/api/v7/categories/FKEN1500000?filter=&sortBy=relevance&" \
+                           "currentPage={}&pageSize=60&maxPrice=&minPrice=&areaCode=Westlands%20-%20Nairobi&lang=" \
+                           "en&displayCurr=KES&latitude=-1.2672236834605626&longitude=36.810586556760555&" \
+                           "responseWithCatTree=true&depth=3".format(page) for page in range(_total_pages + 1)]
 
         self._product_info_list = []  # type: List[ProductInfo]
+
+    def scrap_all_pages(self) -> None:
+        for url in self._page_urls:
+            print(url)
 
     def scrap_product_url(self) -> None:
         category_beverage_url = self._category_beverage_url
@@ -58,7 +71,7 @@ class Scrapper:
                      "all_images_url": ele.all_images_url})
 
     def _get_total_pages(self) -> int:
-        page_src = req.get(self._page_0_url).json()
+        page_src = req.get(self._page_0_url, headers=self._headers).json()
         return page_src["numOfPages"]
 
     @classmethod
@@ -119,3 +132,8 @@ class Scrapper:
         for idx in product_imgs:
             img_url_list.append(idx.get("data-src").strip())
         return img_url_list
+
+
+if __name__ == "__main__":
+    scrapper = Scrapper()
+    scrapper.scrap_all_pages()
