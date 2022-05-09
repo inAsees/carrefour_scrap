@@ -74,12 +74,21 @@ class Scrapper:
             pack_size = self._get_pack_size(product)
             inventory_left = self._get_inventory_left(product)
             description = self._get_description(product)
+            brand = self._get_brand(product)
             image_urls = self._get_image_urls(product)
 
-            return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, image_urls)
+            return ProductInfo(product_url, product_name, price, pack_size, inventory_left, description, brand,
+                               image_urls)
 
     def _get_product_url(self, product: Dict) -> str:
         return self._base_url + product["links"]["productUrl"]["href"]
+
+    def _get_description(self, product: Dict) -> str:
+        product_url = self._get_product_url(product)
+        page_src = req.get(product_url, headers=self._headers).text
+        product_soup = bs(page_src, "html.parser")
+        product_json = product_soup.find("script", {"type": "application/ld+json"}).json()
+        return product_json["description"]
 
     @staticmethod
     def _get_product_name(product: Dict) -> str:
@@ -104,12 +113,9 @@ class Scrapper:
         except AttributeError as e:
             return None
 
-    def _get_description(self, product: Dict) -> str:
-        product_url = self._get_product_url(product)
-        page_src = req.get(product_url, headers=self._headers).text
-        product_soup = bs(page_src, "html.parser")
-        product_json = product_soup.find("script", {"type": "application/ld+json"}).json()
-        return product_json["description"]
+    @staticmethod
+    def _get_brand(product: Dict) -> Optional[str]:
+        return product["brand"]["name"]
 
     @staticmethod
     def _get_image_urls(product: Dict) -> List[str]:
