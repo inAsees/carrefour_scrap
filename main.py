@@ -47,7 +47,7 @@ class Scrapper:
             page_no += 1
 
     def dump(self) -> None:
-        with open("dump.csv", "w", encoding="utf-8", newline="") as f:
+        with open("output.csv", "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["product_url", "product_name", "price", "pack_size",
                                                    "inventory_left", "description", "brand", "image_urls"])
             writer.writeheader()
