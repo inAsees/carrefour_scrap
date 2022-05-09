@@ -13,7 +13,7 @@ class ProductInfo:
     product_name: str
     price: str
     pack_size: str
-    inventory_left: int
+    inventory_left: str
     description: str
     all_images_url: List[str]
 
@@ -68,7 +68,7 @@ class Scrapper:
             product_name = self._get_product_name(product)
             price = self._get_price(product)
             pack_size = self._get_pack_size(product)
-            inventory_left = self._get_inventory_left(product_soup)
+            inventory_left = self._get_inventory_left(product)
             description = self._get_description(product_soup)
             image_urls = self._get_image_urls(product_soup)
 
@@ -94,14 +94,11 @@ class Scrapper:
             return ""
 
     @staticmethod
-    def _get_inventory_left(product_soup: bs) -> int:
+    def _get_inventory_left(product: Dict) -> str:
         try:
-            product_txt = product_soup.find("div", {"class": "css-g4iap9"}).text.split()
-            for i in product_txt:
-                if i.isdigit():
-                    return int(i)
+            return str(product["stock"]["value"])
         except AttributeError as e:
-            return 0
+            return ""
 
     @staticmethod
     def _get_description(product_soup: bs) -> str:
